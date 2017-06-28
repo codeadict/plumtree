@@ -19,3 +19,5 @@ _tdeps
 logs
 erln8.config
 .local_dialyzer_plt
+.idea/
+*.iml
