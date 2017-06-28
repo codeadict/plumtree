@@ -19,16 +19,16 @@
 %% -------------------------------------------------------------------
 -module(plumtree_metadata_exchange_fsm).
 
--behaviour(gen_fsm).
+-behaviour(gen_statem).
 
 %% API
 -export([start/2]).
 
-%% gen_fsm callbacks
+%% gen_statem callbacks
 -export([init/1, handle_event/3, handle_sync_event/4,
          handle_info/3, terminate/3, code_change/4]).
 
-%% gen_fsm states
+%% gen_statem states
 -export([prepare/2,
          prepare/3,
          update/2,
@@ -71,14 +71,14 @@
 %% to aqcuire the remote lock or to upate both trees.
 -spec start(node(), pos_integer()) -> {ok, pid()} | ignore | {error, term()}.
 start(Peer, Timeout) ->
-    gen_fsm:start(?MODULE, [Peer, Timeout], []).
+    gen_statem:start(?MODULE, [Peer, Timeout], []).
 
 %%%===================================================================
-%%% gen_fsm callbacks
+%%% gen_statem callbacks
 %%%===================================================================
 
 init([Peer, Timeout]) ->
-    gen_fsm:send_event(self(), start),
+    gen_statem:send_event(self(), start),
     {ok, prepare, #state{peer=Peer,built=0,timeout=Timeout}}.
 
 handle_event(_Event, StateName, State) ->
@@ -98,7 +98,7 @@ code_change(_OldVsn, StateName, State, _Extra) ->
     {ok, StateName, State}.
 
 %%%===================================================================
-%%% gen_fsm states
+%%% gen_statem states
 %%%===================================================================
 prepare(start, State) ->
     %% get local lock
@@ -295,6 +295,6 @@ as_event(F) ->
     Self = self(),
     spawn_link(fun() ->
                        Result = F(),
-                       gen_fsm:send_event(Self, Result)
+                       gen_statem:send_event(Self, Result)
                end),
     ok.
