@@ -22,7 +22,7 @@
 -behaviour(gen_statem).
 
 %% API
--export([start/2]).
+-export([callback_mode/0, start/2]).
 
 %% gen_statem callbacks
 -export([init/1, handle_event/3, handle_sync_event/4,
@@ -65,6 +65,9 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+callback_mode() ->
+  state_functions.
 
 %% @doc Start an exchange of Cluster Metadata hashtrees between this node
 %% and `Peer'. `Timeout' is the number of milliseconds the process will wait
